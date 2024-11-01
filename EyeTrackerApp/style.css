@@ -1,0 +1,17 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Arial, sans-serif;
+}
+
+#video {
+    width: 640px;
+    height: 480px;
+    border: 1px solid black;
+    margin-top: 20px;
+}
+
+#canvas {
+    display: none; /* Solo per debug */
+}
