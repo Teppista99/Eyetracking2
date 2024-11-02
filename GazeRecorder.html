@@ -1,0 +1,97 @@
+<html>
+<head>
+    <script src="js/GazeCloudAPI.js"></script>
+    <script src="js/GazeRecorderAPI.js"></script>
+    <script src="js/GazePlayer.js"></script>
+
+    <script>
+        GazeRecorderAPI.OnNavigation = function(url) {
+            document.getElementById("url").value = url;
+        }
+
+        function EndRec() {
+            document.getElementById("navi").style.display = 'none';
+            GazeRecorderAPI.StopRec();
+            GazeCloudAPI.StopEyeTracking();
+        }
+
+        function PlayRec() {
+            EndRec();
+            GazePlayer.SetCountainer(document.getElementById("playerdiv"));
+            var SesionReplayData = GazeRecorderAPI.GetRecData();
+            GazePlayer.PlayResultsData(SesionReplayData);
+			saveRec();
+        }
+
+        function start() {
+            document.getElementById("navi").style.display = 'block';
+            var url = document.getElementById("urlstart").value;
+            GazeCloudAPI.StartEyeTracking();
+            GazeCloudAPI.OnCalibrationComplete = function() {
+                GazeRecorderAPI.Rec(url);
+            };
+        }
+
+        function Navigate() {
+            var url = document.getElementById("url").value;
+            GazeRecorderAPI.Navigate(url);
+        }
+//FILE JSON
+		// function saveRec() {
+        //     var SesionReplayData = GazeRecorderAPI.GetRecData(); // Ottieni i dati della registrazione
+        //     var dataStr = JSON.stringify(SesionReplayData); // Converti in stringa JSON
+        //     var blob = new Blob([dataStr], { type: 'application/json' }); // Crea un Blob
+        //     var url = URL.createObjectURL(blob); // Crea un URL per il Blob
+        
+        //     var a = document.createElement('a'); // Crea un elemento <a> per il download
+        //     a.href = url;
+        //     a.download = 'registrazione.json'; // Nome del file
+        //     document.body.appendChild(a);
+        //     a.click(); // Simula un click per avviare il download
+        //     document.body.removeChild(a); // Rimuovi l'elemento
+        //     URL.revokeObjectURL(url); // Revoca l'URL creato
+        // }
+
+//FILE SVG
+function saveRec() {
+    var SesionReplayData = GazeRecorderAPI.GetRecData(); // Ottieni i dati della registrazione
+    var svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500">
+                        <text x="10" y="20" font-size="16" fill="black">Recording Data</text>
+                        <text x="10" y="40" font-size="12" fill="black">${JSON.stringify(SesionReplayData)}</text>
+                      </svg>`; // Crea un contenuto SVG
+
+    var blob = new Blob([svgContent], { type: 'image/svg+xml' }); // Crea un Blob
+    var url = URL.createObjectURL(blob); // Crea un URL per il Blob
+
+    var a = document.createElement('a'); // Crea un elemento <a> per il download
+    a.href = url;
+    a.download = 'registrazione.svg'; // Nome del file
+    document.body.appendChild(a);
+    a.click(); // Simula un click per avviare il download
+    document.body.removeChild(a); // Rimuovi l'elemento
+    URL.revokeObjectURL(url); // Revoca l'URL creato
+}
+		
+    </script>
+
+	
+</head>
+
+<body>
+    <div id="navi" style="display:none; position: fixed; top: 0px; left: 0px; opacity: .8; margin-left:auto;margin-right:auto; z-index: 90;">
+        Url: <input type="text" id="url" name="name" required size="50" value="https://www.google.com">
+        <button onclick="Navigate();" type="button">Go</button>
+        <button onclick="PlayRec()" type="button">Finish Recording, Play results</button>
+    </div>
+
+    <h1 align='center'>GazeRecorderAPI Integration Example</h1>
+
+    <div style="background-color: white; position: absolute; top: 50%; left: 50%; margin-right: -50%; transform: translate(-50%, -50%)">
+        <p align='center'>URL</p>
+        <input type="text" id="urlstart" name="name" required size="50" value="https://www.google.com">
+        <button onclick="start()" type="button">Start</button>
+    </div>
+
+    <div id="playerdiv" style="background-color: white; position: absolute; top: 50%; left: 50%; margin-right: -50%; transform: translate(-50%, -50%)"></div>
+</body>
+</html>
